@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, ImageBackground, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, ImageBackground, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 
 const Start = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -35,11 +35,20 @@ const Start = ({ navigation }) => {
             ))}
           </View>
           {/* button to navigate to chat page */}
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Chat', { name: name, background: background })}>
-            <Text>Go to Chat</Text>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={() => navigation.navigate('Chat', { name: name, background: background })}
+            accessible={true}
+            accessibilityLabel="Start chatting"
+            accessibilityHint="takes you to the chat window of the app"
+            accessibilityRole="button"
+          >
+            <Text>Start chatting</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>
+      {/* ensures onscreen elements are not hidden by keyboard */}
+      { Platform.OS === 'ios' ? <KeyboardAvoidingView behavior="padding" /> : null }
     </View>
   );
 }
