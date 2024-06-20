@@ -61,6 +61,7 @@ return (
         _id: 1
       }}
     />
+    {/* ensures onscreen elements are not hidden by keyboard */}
     { Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null }
   </View>
 )
