@@ -5,7 +5,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore, disableNetwork, enableNetwork } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth";
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { LogBox, StyleSheet } from "react-native";
 
@@ -48,7 +48,7 @@ const App = () => {
   } catch (error) {
     if (error.code === 'auth/app-deleted') {
       auth = initializeAuth(app, {
-        persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+        persistence: getReactNativePersistence(AsyncStorage)
       });
     }
   }
