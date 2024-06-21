@@ -1,29 +1,48 @@
 import { useState } from 'react';
-import { StyleSheet, ImageBackground, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, ImageBackground, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
+// Initialize the Start component
 const Start = ({ navigation }) => {
+  const auth = getAuth();
   const [name, setName] = useState('');
-  const colors = ['red', 'blue', 'green', 'yellow'];
+  const colors = ['#090C08', '#474056', '#8A95A5', '#B9C6AE'];
   const [background, setBackground] = useState('');
 
+  const signInUser = () => {
+    signInAnonymously(auth)
+      .then((result) => {
+        navigation.navigate("Chat", {
+          name: name,
+          background: background,
+          userID: result.user.uid,
+        });
+        Alert.alert("Signed in Successfully!");
+      })
+      .catch((error) => {
+        Alert.alert("Unable to sign in, try later again.");
+      });
+  };
+
   return (
-    <View style={styles.container}>
-      <ImageBackground source={require("../img/background-image.png")} resizeMode="cover" style={styles.bgimage}>
+    <ImageBackground source={require("../img/background-image.png")} resizeMode="cover" style={styles.bgimage}>
+      <View style={styles.container}>
         <View style={styles.content}>
-          {/* This is the App's title */}
           <Text style={styles.title}>Chat App</Text>
           <TextInput
             style={styles.textInput}
             value={name}
             onChangeText={setName}
             placeholder='Type your username here'
-            placeholderTextColor="white" // Added to ensure placeholder is visible
+            placeholderTextColor="white" 
           />
-          {/* background colour selector for chat page */}
           <Text style={styles.chooseBgColor}>Select Background Color</Text>
           <View style={styles.colorButtonContainer}>
             {colors.map((color, index) => (
               <TouchableOpacity
+                accessibilityLabel="Color Button"
+                accessibilityHint="Allows you to select the background colour of the chat screen"
+                accessibilityRole="button"
                 key={index}
                 style={[
                   styles.colorButton,
@@ -34,26 +53,29 @@ const Start = ({ navigation }) => {
               />
             ))}
           </View>
-          {/* button to navigate to chat page */}
           <TouchableOpacity 
             style={styles.button} 
-            onPress={() => navigation.navigate('Chat', { name: name, background: background })}
+            onPress={() => {
+              if (name === '') {
+                Alert.alert('You must enter a username');
+              } else {
+                signInUser();
+              }
+            }}
             accessible={true}
             accessibilityLabel="Start chatting"
-            accessibilityHint="takes you to the chat window of the app"
+            accessibilityHint="takes you to the chat screen of the app"
             accessibilityRole="button"
           >
             <Text>Start chatting</Text>
           </TouchableOpacity>
         </View>
-      </ImageBackground>
-      {/* ensures onscreen elements are not hidden by keyboard */}
-      { Platform.OS === 'ios' ? <KeyboardAvoidingView behavior="padding" /> : null }
-    </View>
+        { Platform.OS === 'ios' ? <KeyboardAvoidingView behavior="padding" /> : null }
+      </View>
+    </ImageBackground>
   );
-}
+};
 
-{/* styling for Start page */}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -69,13 +91,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    padding: 20, // Optional: adds some padding around the content
+    padding: 20,
   },
   title: {
     fontSize: 60,
     fontWeight: '600',
     color: 'white',
-    marginBottom: 20, // Optional: adds space between elements
+    marginBottom: 20,
   },
   textInput: {
     width: '88%',
@@ -97,7 +119,7 @@ const styles = StyleSheet.create({
   colorButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 20, // Optional: adds space between elements
+    marginBottom: 20,
   },
   colorButton: {
     width: 50,

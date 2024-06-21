@@ -1,77 +1,79 @@
 import { useState, useEffect } from 'react';
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
-import { StyleSheet, View, Text, KeyboardAvoidingView, Platform } from 'react-native';
+import { GiftedChat } from "react-native-gifted-chat";
+import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
+import { onSnapshot, query, orderBy, collection, addDoc } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Chat = ({ route, navigation }) => {
-    const { name, background } = route.params;
-    const [messages, setMessages] = useState([]);
-    const onSend = (newMessages) => {
-      setMessages(previousMessages => GiftedChat.append(previousMessages, newMessages))
+const Chat = ({ route, navigation, db, isConnected }) => {
+  const { name, background, userID } = route.params;
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    let unsubMessages;
+
+    if (isConnected) {
+      if (unsubMessages) unsubMessages();
+      unsubMessages = null;
+
+      const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+      unsubMessages = onSnapshot(q, (documentSnapshot) => {
+        const newMessages = documentSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: new Date(doc.data().createdAt.toMillis())
+        }));
+        cacheMessagesHistory(newMessages);
+        setMessages(newMessages);
+      });
+    } else {
+      loadCachedMessages();
     }
 
-    {/* function is called after Chat component mounts */}
-    useEffect(() => {
-      setMessages([
-        {
-          _id: 1,
-          text: "Hello developer",
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: "React Native",
-            avatar: "https://placeimg.com/140/140/any",
-          },
-        },
-        {
-          _id: 2,
-          text: 'This is a system message',
-          createdAt: new Date(),
-          system: true,
-        },
-      ]);
-    }, []);
+    return () => {
+      if (unsubMessages) unsubMessages();
+    };
+  }, [isConnected]);
 
-{/* updates displayed name based on selection */}
-    useEffect(() => {
-        navigation.setOptions({ title: name });
-    }, []);
+  const loadCachedMessages = async () => {
+    const cachedMessages = await AsyncStorage.getItem("chat_messages") || '[]';
+    setMessages(JSON.parse(cachedMessages));
+  };
 
-    const renderBubble = (props) => {
-      return <Bubble
-        {...props}
-        wrapperStyle={{
-          right: {
-            backgroundColor: "#000"
-          },
-          left: {
-            backgroundColor: "#FFF"
-          }
+  const cacheMessagesHistory = async (listsToCache) => {
+    try {
+      await AsyncStorage.setItem('chat_messages', JSON.stringify(listsToCache));
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const onSend = (newMessages) => {
+    addDoc(collection(db, "messages"), newMessages[0]);
+  };
+
+  useEffect(() => {
+    navigation.setOptions({ title: name });
+  }, []);
+
+  return (
+    <View style={[styles.container, { backgroundColor: background }]}>
+      <GiftedChat
+        messages={messages}
+        onSend={messages => onSend(messages)}
+        user={{
+          _id: userID,
+          name
         }}
       />
-    }
+      {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null}
+    </View>
+  );
+};
 
-{/* updates background colour based on selection*/}
-return (
-  <View style={[styles.container, { backgroundColor: background }]}>
-    <GiftedChat
-      messages={messages}
-      renderBubble={renderBubble}
-      onSend={messages => onSend(messages)}
-      user={{
-        _id: 1
-      }}
-    />
-    {/* ensures onscreen elements are not hidden by keyboard */}
-    { Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null }
-  </View>
-)
-}
-
-{/* styling for Chat page */}
 const styles = StyleSheet.create({
- container: {
-   flex: 1,
- }
+  container: {
+    flex: 1,
+  }
 });
 
 export default Chat;
