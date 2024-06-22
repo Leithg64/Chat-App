@@ -54,13 +54,15 @@ const App = () => {
   }
 
   const connectionStatus = useNetInfo();
+
   useEffect(() => {
-    if (connectionStatus.isConnected) {
-      enableNetwork(db);
-    } else {
-      disableNetwork(db);
-    }
-  }, [connectionStatus.isConnected]);
+  if (connectionStatus.isConnected === false) {
+    Alert.alert("Connection lost");
+    disableNetwork(db);
+  } else if (connectionStatus.isConnected === true) {
+    enableNetwork(db);
+  }
+}, [connectionStatus.isConnected]);
 
   return (
     <NavigationContainer>
