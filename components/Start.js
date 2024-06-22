@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, ImageBackground, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { getAuth, signInAnonymously } from 'firebase/auth';
 
-// Initialize the Start component
 const Start = ({ navigation }) => {
   const auth = getAuth();
   const [name, setName] = useState('');
