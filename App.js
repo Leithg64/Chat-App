@@ -24,6 +24,16 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   const connectionStatus = useNetInfo();
 
+  //Web's Firebase Configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCl8pHmobw4pRHC6am59XAkR8kVuPO32Xs",
+    authDomain: "chat-app-dbcbc.firebaseapp.com",
+    projectId: "chat-app-dbcbc",
+    storageBucket: "chat-app-dbcbc.appspot.com",
+    messagingSenderId: "994094769982",
+    appId: "1:994094769982:web:7189a408e8d0882cbdae6f"
+  };
+
   useEffect(() => {
     if (connectionStatus.isConnected === false) {
       Alert.alert("Connection Lost!");
@@ -32,18 +42,7 @@ const App = () => {
       enableNetwork(db);
     }
   }, [connectionStatus.isConnected]);
-
-  //Web's Firebase Configuration
-  const App = () => {
-    const firebaseConfig = {
-      apiKey: "AIzaSyCl8pHmobw4pRHC6am59XAkR8kVuPO32Xs",
-      authDomain: "chat-app-dbcbc.firebaseapp.com",
-      projectId: "chat-app-dbcbc",
-      storageBucket: "chat-app-dbcbc.appspot.com",
-      messagingSenderId: "994094769982",
-      appId: "1:994094769982:web:7189a408e8d0882cbdae6f"
-    };
-  }
+  
 
   //Initialize Firebase
   const app = initializeApp(firebaseConfig);

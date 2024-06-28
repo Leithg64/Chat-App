@@ -27,16 +27,16 @@ const Start = ({ navigation}) => {
                 style={styles.imageBackground}
                 >
             {/*user selects username*/}
-            <Text style={styles.title}>Connect to Chat!</Text>
+            <Text style={styles.title}>Chat App</Text>
             <View style={styles.box}>
             <TextInput
             style={styles.textInput}
             value={name}
             onChangeText={setName}
-            placeholder="Type your Username here"
+            placeholder="Enter your Username"
             />
             {/* the user selects background color*/}
-            <Text style={styles.chooseBgColor}>Choose Background Color</Text>
+            <Text style={styles.chooseBgColor}>Select Background Color</Text>
             <View style={styles.colorButtonContainer}>
                 {colors.map((color, index) => (
                     <TouchableOpacity key={index}
@@ -50,7 +50,7 @@ const Start = ({ navigation}) => {
             style={styles.button}
             onPress={signInUser}
             >
-            <Text style={styles.buttonText}>Start the chat</Text>
+            <Text style={styles.buttonText}>Start Chatting</Text>
            </TouchableOpacity>
            </View>
             </ImageBackground>
